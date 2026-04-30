@@ -47,8 +47,7 @@ export const Pagination = ({
   return (
     <nav
       aria-label={PAGINATION_CONSTANTS.NAV_ARIA_LABEL}
-      aria-busy={isPending}
-      aria-disabled={isPending}
+      aria-busy={isPending || undefined}
       className={cn(classes.nav, className)}
     >
       <div

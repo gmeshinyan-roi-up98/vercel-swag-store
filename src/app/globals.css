@@ -70,6 +70,10 @@ button:not(:disabled):not([aria-disabled="true"]) {
   .card {
     @apply rounded-lg border border-border bg-card;
   }
+
+  .pagination-nav a[href] {
+    -webkit-tap-highlight-color: transparent;
+  }
 }
 
 @keyframes shimmer {
