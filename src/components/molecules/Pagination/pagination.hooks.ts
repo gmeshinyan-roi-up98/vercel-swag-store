@@ -1,34 +1,40 @@
 "use client";
 
 import type { Route } from "next";
-import { useCallback, useTransition, type MouseEvent } from "react";
+import { useState, useTransition, type MouseEvent } from "react";
 import { useRouter } from "next/navigation";
 
 type TUseSearchPaginationReturn = {
   isPending: boolean;
+  pendingHref: string | null;
   handlePaginationLinkClick: (event: MouseEvent<HTMLAnchorElement>) => void;
 };
 
 export const useSearchPagination = (): TUseSearchPaginationReturn => {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
+  const [pendingHref, setPendingHref] = useState<string | null>(null);
 
-  const handlePaginationLinkClick = useCallback(
-    (event: MouseEvent<HTMLAnchorElement>) => {
-      event.preventDefault();
-      if (isPending) {
-        return;
-      }
-      const path = event.currentTarget.getAttribute("href");
-      if (!path) {
-        return;
-      }
-      startTransition(() => {
-        router.push(path as Route);
-      });
-    },
-    [isPending, router],
-  );
+  const handlePaginationLinkClick = (
+    event: MouseEvent<HTMLAnchorElement>,
+  ) => {
+    event.preventDefault();
+    if (isPending) {
+      return;
+    }
+    const path = event.currentTarget.getAttribute("href");
+    if (!path) {
+      return;
+    }
+    setPendingHref(path);
+    startTransition(() => {
+      router.push(path as Route);
+    });
+  };
 
-  return { isPending, handlePaginationLinkClick };
+  return {
+    isPending,
+    pendingHref: isPending ? pendingHref : null,
+    handlePaginationLinkClick,
+  };
 };

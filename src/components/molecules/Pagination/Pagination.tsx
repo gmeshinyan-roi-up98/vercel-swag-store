@@ -20,7 +20,8 @@ export const Pagination = ({
   className,
   pagination,
 }: TPaginationProps) => {
-  const { isPending, handlePaginationLinkClick } = useSearchPagination();
+  const { isPending, pendingHref, handlePaginationLinkClick } =
+    useSearchPagination();
   const {
     totalPages,
     hasNextPage,
@@ -31,6 +32,17 @@ export const Pagination = ({
   if (totalPages <= 1) return null;
 
   const pageItems = getPaginationPageItems({ currentPage, totalPages });
+
+  const prevHref = buildSearchPath({
+    query,
+    category,
+    page: currentPage - 1,
+  });
+  const nextHref = buildSearchPath({
+    query,
+    category,
+    page: currentPage + 1,
+  });
 
   return (
     <nav
@@ -47,9 +59,13 @@ export const Pagination = ({
         {hasPreviousPage ? (
           <Link
             prefetch
-            className={classes.navArrowInteractive}
+            className={cn(
+              classes.navArrowInteractive,
+              pendingHref === prevHref && classes.controlPendingTarget,
+              isPending && pendingHref !== prevHref && classes.controlDimmed,
+            )}
             aria-label={PAGINATION_CONSTANTS.PREVIOUS_ARIA}
-            href={buildSearchPath({ query, category, page: currentPage - 1 })}
+            href={prevHref}
             onClick={handlePaginationLinkClick}
           >
             <PreviousNavIcon className={classes.navIcon} />
@@ -61,41 +77,68 @@ export const Pagination = ({
         )}
 
         <ul className={classes.pageList}>
-          {pageItems.map((item, index) =>
-            item === "ellipsis" ? (
-              <li key={`e-${index}`} className={classes.ellipsis} aria-hidden>
-                {PAGINATION_CONSTANTS.ELLIPSIS_CHARACTER}
-              </li>
-            ) : (
+          {pageItems.map((item, index) => {
+            if (item === "ellipsis") {
+              return (
+                <li
+                  key={`e-${index}`}
+                  className={classes.ellipsis}
+                  aria-hidden
+                >
+                  {PAGINATION_CONSTANTS.ELLIPSIS_CHARACTER}
+                </li>
+              );
+            }
+
+            const pageHref = buildSearchPath({
+              query,
+              category,
+              page: item,
+            });
+            const isPendingTarget = pendingHref === pageHref;
+            const showCurrentHighlight = item === currentPage && !isPending;
+
+            return (
               <li key={item}>
                 <Link
-                  href={buildSearchPath({ query, category, page: item })}
+                  href={pageHref}
                   prefetch
                   aria-label={getPaginationPageAriaLabel({ page: item })}
                   aria-current={item === currentPage ? "page" : undefined}
                   className={cn(
                     classes.pageLink,
-                    item === currentPage
-                      ? classes.pageLinkActive
-                      : classes.pageLinkIdle,
+                    isPending && isPendingTarget
+                      ? classes.controlPendingTarget
+                      : showCurrentHighlight
+                        ? classes.pageLinkActive
+                        : classes.pageLinkIdle,
+                    isPending &&
+                      !isPendingTarget &&
+                      classes.controlDimmed,
                   )}
                   onClick={
-                    item === currentPage ? undefined : handlePaginationLinkClick
+                    item === currentPage
+                      ? undefined
+                      : handlePaginationLinkClick
                   }
                 >
                   {item}
                 </Link>
               </li>
-            ),
-          )}
+            );
+          })}
         </ul>
 
         {hasNextPage ? (
           <Link
             prefetch
-            className={classes.navArrowInteractive}
+            className={cn(
+              classes.navArrowInteractive,
+              pendingHref === nextHref && classes.controlPendingTarget,
+              isPending && pendingHref !== nextHref && classes.controlDimmed,
+            )}
             aria-label={PAGINATION_CONSTANTS.NEXT_ARIA}
-            href={buildSearchPath({ query, category, page: currentPage + 1 })}
+            href={nextHref}
             onClick={handlePaginationLinkClick}
           >
             <NextNavIcon className={classes.navIcon} />
