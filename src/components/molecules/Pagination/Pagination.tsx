@@ -1,8 +1,11 @@
+"use client";
+
 import Link from "next/link";
 
 import { cn, buildSearchPath } from "@/lib";
 import { NextNavIcon, PreviousNavIcon } from "@/components/icons";
 
+import { useSearchPagination } from "./pagination.hooks";
 import { classes } from "./paginationStyles";
 import type { TPaginationProps } from "./types";
 import { PAGINATION_CONSTANTS } from "./pagination.const";
@@ -17,6 +20,7 @@ export const Pagination = ({
   className,
   pagination,
 }: TPaginationProps) => {
+  const { isPending, handlePaginationLinkClick } = useSearchPagination();
   const {
     totalPages,
     hasNextPage,
@@ -31,15 +35,22 @@ export const Pagination = ({
   return (
     <nav
       aria-label={PAGINATION_CONSTANTS.NAV_ARIA_LABEL}
+      aria-busy={isPending}
       className={cn(classes.nav, className)}
     >
-      <div className={classes.cluster}>
+      <div
+        className={cn(
+          classes.cluster,
+          isPending ? classes.clusterPending : undefined,
+        )}
+      >
         {hasPreviousPage ? (
           <Link
-            prefetch={false}
+            prefetch
             className={classes.navArrowInteractive}
             aria-label={PAGINATION_CONSTANTS.PREVIOUS_ARIA}
             href={buildSearchPath({ query, category, page: currentPage - 1 })}
+            onClick={handlePaginationLinkClick}
           >
             <PreviousNavIcon className={classes.navIcon} />
           </Link>
@@ -59,29 +70,33 @@ export const Pagination = ({
               <li key={item}>
                 <Link
                   href={buildSearchPath({ query, category, page: item })}
-                  prefetch={false}
+                  prefetch
                   aria-label={getPaginationPageAriaLabel({ page: item })}
                   aria-current={item === currentPage ? "page" : undefined}
                   className={cn(
                     classes.pageLink,
                     item === currentPage
                       ? classes.pageLinkActive
-                      : classes.pageLinkIdle
+                      : classes.pageLinkIdle,
                   )}
+                  onClick={
+                    item === currentPage ? undefined : handlePaginationLinkClick
+                  }
                 >
                   {item}
                 </Link>
               </li>
-            )
+            ),
           )}
         </ul>
 
         {hasNextPage ? (
           <Link
-            prefetch={false}
+            prefetch
             className={classes.navArrowInteractive}
             aria-label={PAGINATION_CONSTANTS.NEXT_ARIA}
             href={buildSearchPath({ query, category, page: currentPage + 1 })}
+            onClick={handlePaginationLinkClick}
           >
             <NextNavIcon className={classes.navIcon} />
           </Link>

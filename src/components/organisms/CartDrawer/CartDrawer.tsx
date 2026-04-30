@@ -179,18 +179,6 @@ export const CartDrawer = ({ className }: TCartDrawerProps) => {
                 {formatPrice(subtotal, currency)}
               </span>
             </div>
-            <p className={classes.shippingNote}>
-              {CART_DRAWER_CONSTANTS.SHIPPING_TAX_NOTE}
-            </p>
-            <Button
-              type="button"
-              variant={BUTTON_CONSTANTS.VARIANTS.PRIMARY}
-              disabled
-              className={classes.checkoutButton}
-              title={CART_DRAWER_CONSTANTS.CHECKOUT_TITLE}
-            >
-              {CART_DRAWER_CONSTANTS.CHECKOUT}
-            </Button>
           </footer>
         )}
       </aside>
