@@ -41,9 +41,8 @@ export const classes = {
   lineTotal: "text-sm font-semibold",
   subtotalLabel: "text-muted-foreground",
   subtotalValue: "text-base font-semibold",
-  footer: "border-t border-border px-5 py-4",
-  checkoutButton: "mt-4 w-full cursor-not-allowed",
-  shippingNote: "mt-1 text-xs text-muted-foreground",
+  footer:
+    "border-t border-border px-5 pt-4 pb-[max(1.5rem,env(safe-area-inset-bottom,0px))]",
   itemPrice: "mt-0.5 text-xs text-muted-foreground",
   subtotalRow: "flex items-center justify-between text-sm",
   itemBottomRow: "mt-auto flex items-center justify-between pt-3",

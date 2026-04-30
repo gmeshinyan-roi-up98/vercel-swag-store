@@ -1,7 +1,7 @@
 export const classes = {
-  clearFilters: "mt-2",
-  inputWrap: "relative",
-  searchColumn: "flex-1",
+  clearFilters: "order-1 self-start sm:order-2 sm:mt-2",
+  inputWrap: "relative order-2 sm:order-1",
+  searchColumn: "flex flex-1 flex-col gap-2 sm:gap-0",
   categorySelect: "cursor-pointer sm:w-56",
   form: "flex flex-col gap-3 sm:flex-row sm:items-start",
   searchIcon:
