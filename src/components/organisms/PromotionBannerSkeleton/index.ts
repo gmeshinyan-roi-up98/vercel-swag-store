@@ -1,0 +1,1 @@
+export { PromotionBannerSkeleton } from "./PromotionBannerSkeleton";
