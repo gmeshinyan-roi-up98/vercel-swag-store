@@ -67,11 +67,13 @@ Copy the example file and adjust if your API or site URL changes:
 cp .env.example .env.local
 ```
 
-| Variable                   | Purpose                                                                      |
-| -------------------------- | ---------------------------------------------------------------------------- |
-| `NEXT_PUBLIC_API_BASE_URL` | Base URL of the store API                                                    |
-| `API_BYPASS_TOKEN`         | Server-only token for deployment protection bypass on upstream requests      |
-| `NEXT_PUBLIC_SITE_URL`     | Canonical site URL (Open Graph, links) — defaults to `http://localhost:3000` |
+| Variable                   | Required | Purpose                                                                                                  |
+| -------------------------- | -------- | -------------------------------------------------------------------------------------------------------- |
+| `NEXT_PUBLIC_API_BASE_URL` | Yes      | Base URL of the store API                                                                                |
+| `API_BYPASS_TOKEN`         | Yes      | Server-only token sent as `x-vercel-protection-bypass` to bypass deployment protection on the upstream   |
+| `NEXT_PUBLIC_SITE_URL`     | No       | Canonical site URL (Open Graph, sitemap, links) — defaults to `http://localhost:3000`                    |
+| `APP_STATE`                | No       | Toggles the maintenance proxy in `src/proxy.ts`. Set to `maintenance` to redirect all routes to `/maintenance` |
+| `VERCEL_OIDC_TOKEN`        | No       | Auto-injected by Vercel for OIDC-based auth to upstream services; not read directly by the app          |
 
 ### Install and run
 
@@ -100,8 +102,9 @@ Open [http://localhost:3000](http://localhost:3000).
 - **Data layer** — Typed API modules under `src/lib/api/` with `'use cache'`, `cacheLife`, and `cacheTag` where appropriate; stock and cart use uncached or short-lived paths.
 - **Schemas** — Shared Zod models in `src/lib/schemas/` for API and form safety.
 - **Cart** — Session cookie + server actions in `src/lib/cart/` (e.g. `cart/actions/`); mutations refresh cart tags and relevant paths.
-- **UI** — Organized templates and components under `src/components/` (organisms, molecules, templates) with co-located styles where used.
+- **UI** — Atomic-design layout under `src/components/` (`atoms`, `icons`, `molecules`, `organisms`, `templates`) with co-located styles, types, constants, and hooks per component.
 - **Suspense** — Cart badge, drawer payload, promotions, search results, and product stock stream inside `<Suspense>` so the static shell ships immediately.
+- **Maintenance mode** — `src/proxy.ts` (Next.js proxy/middleware) reads `APP_STATE` and redirects traffic to `/maintenance` when enabled.
 
 For a deeper walkthrough of caching choices and server actions, see inline documentation and comments in the API and cart modules.
 
@@ -112,13 +115,37 @@ For a deeper walkthrough of caching choices and server actions, see inline docum
 ```
 src/
 ├── app/                    # App Router: pages, layout, metadata, OG image, sitemap, robots
-├── components/             # UI (templates, organisms, molecules, etc.)
+│   ├── products/[param]/   # Product detail (slug or id)
+│   ├── search/             # Search results
+│   ├── maintenance/        # Maintenance screen
+│   ├── layout.tsx          # Root layout (analytics, providers, chrome)
+│   ├── globals.css         # Tailwind v4 global styles
+│   ├── error.tsx           # Global error boundary
+│   ├── not-found.tsx       # 404
+│   ├── loading.tsx         # Root loading UI
+│   ├── robots.ts           # robots.txt
+│   └── sitemap.ts          # sitemap.xml
+├── components/             # Atomic-design UI
+│   ├── atoms/              # Button, Input, Select, IconButton, CartQuantityStepper
+│   ├── icons/              # SVG icon components
+│   ├── molecules/          # AddToCartForm, CartButton, ProductCard, Pagination, skeletons, …
+│   ├── organisms/          # CartDrawer, Header, Footer, HomeHero, SearchResultsSection, …
+│   └── templates/          # Page-level shells (HomePage, ProductDetailPage, SearchPage, …)
 ├── context/                # Client context (cart UI/state)
-├── providers/              # Server/client providers and hydrators
-├── lib/                    # API clients, schemas, env, cart, metadata, utilities
-├── constants/              # Routes and app constants
-├── hooks/                  # Shared React hooks
-└── proxy.ts                # Request-handler sketch for environment-driven maintenance redirects
+├── providers/              # Server/client providers and cart hydrators
+├── lib/                    # API clients, schemas, env, cart, metadata, search URL, utilities
+│   ├── api/                # Typed API modules (products, stock, cart, categories, promotions, …)
+│   ├── cart/               # Server actions and session helpers
+│   ├── schemas/            # Shared Zod models
+│   ├── metadata/           # Per-route metadata builders
+│   ├── searchUrl/          # URL-state helpers for the search page
+│   ├── env.ts              # Zod-validated env loader
+│   └── cache-tags.ts       # Centralized cache-tag keys
+├── constants/              # Routes, global app constants, app-state enum
+├── hooks/                  # Shared React hooks (useEscapeKey, useBodyScrollLock)
+├── types/                  # Shared TS type helpers
+├── assets/                 # Static assets (default Open Graph image)
+└── proxy.ts                # Maintenance-mode proxy keyed on APP_STATE
 ```
 
 ---
