@@ -17,6 +17,7 @@ export const AddToCartForm = ({
     error,
     inCart,
     quantity,
+    inputValue,
     handleAdd,
     buttonLabel,
     isOutOfStock,
@@ -24,6 +25,7 @@ export const AddToCartForm = ({
     availableToAdd,
     buttonDisabled,
     handleIncrease,
+    handleQuantityBlur,
     handleQuantityChange,
   } = useAddToCartForm({ productId, initialStock });
 
@@ -42,9 +44,10 @@ export const AddToCartForm = ({
             min={1}
             max={cap}
             type="number"
-            value={quantity}
+            value={inputValue}
             inputMode="numeric"
             disabled={buttonDisabled}
+            onBlur={handleQuantityBlur}
             onChange={handleQuantityChange}
             variant={INPUT_CONSTANTS.VARIANTS.QUANTITY}
             aria-label={ADD_TO_CART_FORM_CONSTANTS.QUANTITY_INPUT_ARIA}

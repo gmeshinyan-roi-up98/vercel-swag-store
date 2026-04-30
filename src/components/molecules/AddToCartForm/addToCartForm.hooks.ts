@@ -12,7 +12,7 @@ export const useAddToCartForm = ({
   initialStock,
 }: TAddToCartFormProps) => {
   const { open } = useCartUI();
-  const [rawQuantity, setRawQuantity] = useState(1);
+  const [inputValue, setInputValue] = useState("1");
   const { addItem, isPending, getStock, getQuantity, error } = useCartState();
 
   const stock = getStock(productId) ?? initialStock ?? undefined;
@@ -28,13 +28,18 @@ export const useAddToCartForm = ({
 
   const cap = Math.max(1, Number.isFinite(availableToAdd) ? availableToAdd : 1);
 
-  const quantity = Math.min(Math.max(1, rawQuantity), cap);
+  const parsedInput = Number(inputValue);
+  const safeParsedInput = Number.isFinite(parsedInput) ? parsedInput : 1;
+  const quantity = Math.min(
+    Math.max(1, Math.floor(safeParsedInput) || 1),
+    cap,
+  );
 
   const handleAdd = async () => {
     const result = await addItem(productId, quantity);
     if (result.ok) {
       open();
-      setRawQuantity(1);
+      setInputValue("1");
     }
   };
 
@@ -48,18 +53,19 @@ export const useAddToCartForm = ({
   const buttonDisabled = isOutOfStock || isAtCap || isPending;
 
   const handleDecrease = () => {
-    setRawQuantity(Math.max(1, quantity - 1));
+    setInputValue(String(Math.max(1, quantity - 1)));
   };
 
   const handleIncrease = () => {
-    setRawQuantity(Math.min(cap, quantity + 1));
+    setInputValue(String(Math.min(cap, quantity + 1)));
   };
 
   const handleQuantityChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const value = Number(event.target.value);
-    if (Number.isNaN(value)) return;
+    setInputValue(event.target.value);
+  };
 
-    setRawQuantity(Math.min(cap, Math.max(1, Math.floor(value))));
+  const handleQuantityBlur = () => {
+    setInputValue(String(quantity));
   };
 
   return {
@@ -67,6 +73,7 @@ export const useAddToCartForm = ({
     error,
     inCart,
     quantity,
+    inputValue,
     handleAdd,
     buttonLabel,
     isOutOfStock,
@@ -75,5 +82,6 @@ export const useAddToCartForm = ({
     handleIncrease,
     handleDecrease,
     handleQuantityChange,
+    handleQuantityBlur,
   };
 };
