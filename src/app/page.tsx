@@ -1,3 +1,8 @@
-const HomePage = () => <div>HomePage</div>;
+import type { Metadata } from "next";
 
-export default HomePage;
+import { homeMetadata } from "@/lib";
+import { HomePageTemplate } from "@/components";
+
+export const metadata: Metadata = homeMetadata;
+
+export default HomePageTemplate;
