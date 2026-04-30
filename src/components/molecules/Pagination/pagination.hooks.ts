@@ -4,19 +4,26 @@ import type { Route } from "next";
 import { useState, useTransition, type MouseEvent } from "react";
 import { useRouter } from "next/navigation";
 
+import type { TPendingPaginationNav } from "./types";
+
 type TUseSearchPaginationReturn = {
   isPending: boolean;
-  pendingHref: string | null;
-  handlePaginationLinkClick: (event: MouseEvent<HTMLAnchorElement>) => void;
+  pendingNavigation: TPendingPaginationNav | null;
+  handlePaginationNav: (
+    event: MouseEvent<HTMLAnchorElement>,
+    source: TPendingPaginationNav["type"],
+  ) => void;
 };
 
 export const useSearchPagination = (): TUseSearchPaginationReturn => {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
-  const [pendingHref, setPendingHref] = useState<string | null>(null);
+  const [pendingNavigationRaw, setPendingNavigationRaw] =
+    useState<TPendingPaginationNav | null>(null);
 
-  const handlePaginationLinkClick = (
+  const handlePaginationNav = (
     event: MouseEvent<HTMLAnchorElement>,
+    source: TPendingPaginationNav["type"],
   ) => {
     event.preventDefault();
     if (isPending) {
@@ -26,7 +33,9 @@ export const useSearchPagination = (): TUseSearchPaginationReturn => {
     if (!path) {
       return;
     }
-    setPendingHref(path);
+    setPendingNavigationRaw(
+      source === "page" ? { type: "page", href: path } : { type: source },
+    );
     startTransition(() => {
       router.push(path as Route);
     });
@@ -34,7 +43,7 @@ export const useSearchPagination = (): TUseSearchPaginationReturn => {
 
   return {
     isPending,
-    pendingHref: isPending ? pendingHref : null,
-    handlePaginationLinkClick,
+    pendingNavigation: isPending ? pendingNavigationRaw : null,
+    handlePaginationNav,
   };
 };

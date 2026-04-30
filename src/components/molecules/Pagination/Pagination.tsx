@@ -20,7 +20,7 @@ export const Pagination = ({
   className,
   pagination,
 }: TPaginationProps) => {
-  const { isPending, pendingHref, handlePaginationLinkClick } =
+  const { isPending, pendingNavigation, handlePaginationNav } =
     useSearchPagination();
   const {
     totalPages,
@@ -61,12 +61,15 @@ export const Pagination = ({
             prefetch
             className={cn(
               classes.navArrowInteractive,
-              pendingHref === prevHref && classes.controlPendingTarget,
-              isPending && pendingHref !== prevHref && classes.controlDimmed,
+              pendingNavigation?.type === "prev" &&
+                classes.controlPendingTarget,
+              isPending &&
+                pendingNavigation?.type !== "prev" &&
+                classes.controlDimmed,
             )}
             aria-label={PAGINATION_CONSTANTS.PREVIOUS_ARIA}
             href={prevHref}
-            onClick={handlePaginationLinkClick}
+            onClick={(event) => handlePaginationNav(event, "prev")}
           >
             <PreviousNavIcon className={classes.navIcon} />
           </Link>
@@ -95,7 +98,9 @@ export const Pagination = ({
               category,
               page: item,
             });
-            const isPendingTarget = pendingHref === pageHref;
+            const isPendingTarget =
+              pendingNavigation?.type === "page" &&
+              pendingNavigation.href === pageHref;
             const showCurrentHighlight = item === currentPage && !isPending;
 
             return (
@@ -119,7 +124,7 @@ export const Pagination = ({
                   onClick={
                     item === currentPage
                       ? undefined
-                      : handlePaginationLinkClick
+                      : (event) => handlePaginationNav(event, "page")
                   }
                 >
                   {item}
@@ -134,12 +139,15 @@ export const Pagination = ({
             prefetch
             className={cn(
               classes.navArrowInteractive,
-              pendingHref === nextHref && classes.controlPendingTarget,
-              isPending && pendingHref !== nextHref && classes.controlDimmed,
+              pendingNavigation?.type === "next" &&
+                classes.controlPendingTarget,
+              isPending &&
+                pendingNavigation?.type !== "next" &&
+                classes.controlDimmed,
             )}
             aria-label={PAGINATION_CONSTANTS.NEXT_ARIA}
             href={nextHref}
-            onClick={handlePaginationLinkClick}
+            onClick={(event) => handlePaginationNav(event, "next")}
           >
             <NextNavIcon className={classes.navIcon} />
           </Link>
