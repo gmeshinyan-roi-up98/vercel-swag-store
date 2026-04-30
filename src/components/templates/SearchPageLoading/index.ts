@@ -1,0 +1,1 @@
+export { SearchPageLoadingTemplate } from "./SearchPageLoading";

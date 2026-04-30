@@ -1,0 +1,1 @@
+export { HomePageLoadingTemplate } from "./HomePageLoading";
