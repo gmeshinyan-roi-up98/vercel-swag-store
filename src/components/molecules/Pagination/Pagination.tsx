@@ -48,6 +48,7 @@ export const Pagination = ({
     <nav
       aria-label={PAGINATION_CONSTANTS.NAV_ARIA_LABEL}
       aria-busy={isPending}
+      aria-disabled={isPending}
       className={cn(classes.nav, className)}
     >
       <div
@@ -55,6 +56,7 @@ export const Pagination = ({
           classes.cluster,
           isPending ? classes.clusterPending : undefined,
         )}
+        inert={isPending ? true : undefined}
       >
         {hasPreviousPage ? (
           <Link

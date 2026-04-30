@@ -5,7 +5,8 @@ const pagerPageLinkCore =
   "inline-flex h-9 min-w-9 shrink-0 items-center justify-center rounded-md px-3 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2";
 
 export const classes = {
-  clusterPending: "pointer-events-none",
+  clusterPending:
+    "pointer-events-none cursor-not-allowed select-none [&_a]:pointer-events-none",
   controlDimmed: "opacity-45",
   controlPendingTarget:
     "bg-accent text-accent-foreground ring-2 ring-accent/70 ring-offset-2 ring-offset-background",
